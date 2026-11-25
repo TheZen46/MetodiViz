@@ -47,7 +47,7 @@ export const SceneViewport: React.FC<SceneViewportProps> = ({
           y: Number(y.toFixed(2)),
           z: z !== undefined ? Number(z.toFixed(2)) : undefined,
           label: `P${idx}`,
-          color: '#facc15',
+          color: '#e5a93c',
           visible: true,
           draggable: true,
         },
@@ -93,7 +93,7 @@ export const SceneViewport: React.FC<SceneViewportProps> = ({
   };
 
   return (
-    <div className="split-right">
+    <>
       <div className="viz-stage">
         {scene.view === '3d' && (
           <View3D
@@ -125,27 +125,33 @@ export const SceneViewport: React.FC<SceneViewportProps> = ({
         <div className="bottom-controls-dock">
           {scene.params.length > 0 && (
             <div className="sliders-row">
-              {scene.params.map((p) => (
-                <div className="slider-chip" key={p.name}>
-                  <div className="slider-chip-head">
-                    <span>{p.label ?? p.name}</span>
-                    <span>{Number.isInteger(p.step) ? p.value : p.value.toFixed(2)}</span>
+              {scene.params.map((p) => {
+                const sliderId = `param-slider-${p.name}`;
+                return (
+                  <div className="slider-chip" key={p.name}>
+                    <div className="slider-chip-head">
+                      <label htmlFor={sliderId}>{p.label ?? p.name}</label>
+                      <span className="slider-value">
+                        {Number.isInteger(p.step) ? p.value : p.value.toFixed(2)}
+                      </span>
+                    </div>
+                    <input
+                      id={sliderId}
+                      type="range"
+                      min={p.min}
+                      max={p.max}
+                      step={p.step}
+                      value={p.value}
+                      onChange={(e) => handleParamChange(p.name, Number(e.target.value))}
+                    />
                   </div>
-                  <input
-                    type="range"
-                    min={p.min}
-                    max={p.max}
-                    step={p.step}
-                    value={p.value}
-                    onChange={(e) => handleParamChange(p.name, Number(e.target.value))}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
           {measures.length > 0 && (
-            <div className="measures-row">
+            <div className="measures-row" aria-label="Misure calcolate in tempo reale">
               {measures.map((m) => (
                 <div className="measure-pill" key={m.label}>
                   <span>{m.label}:</span>
@@ -156,6 +162,6 @@ export const SceneViewport: React.FC<SceneViewportProps> = ({
           )}
         </div>
       )}
-    </div>
+    </>
   );
 };

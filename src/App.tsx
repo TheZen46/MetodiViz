@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, FlaskConical, GraduationCap, Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { parseDsl } from './engine/dsl/dslParser';
 import { DSL_PRESETS } from './engine/dsl/presets';
 import { SceneSpec } from './engine/dsl/types';
@@ -20,60 +20,74 @@ export const App: React.FC = () => {
 
   const handleOpenInSandbox = (scene: SceneSpec) => {
     setSandboxScene(structuredClone(scene));
+    setSandboxKey((k) => k + 1);
     setMode('sandbox');
   };
 
   return (
     <div className="app-shell">
+      <a href="#main-content" className="skip-link">
+        Vai al contenuto principale
+      </a>
+
       <header className="topbar">
-        <div className="brand">
-          <span>MetodiViz</span>
-          <span className="brand-badge">Metodi Matematici · MVP</span>
+        <div className="brand-group">
+          <h1 className="brand-title">MetodiViz</h1>
+          <span className="brand-subtitle">Metodi Matematici</span>
         </div>
 
-        <div className="mode-tabs">
+        <nav className="mode-nav" aria-label="Modalità principali">
           <button
-            className={`mode-tab ${mode === 'proofs' ? 'active' : ''}`}
+            type="button"
+            className="mode-tab"
+            aria-pressed={mode === 'proofs'}
             onClick={() => setMode('proofs')}
           >
-            <GraduationCap size={16} />
             Studio Dimostrazioni
           </button>
           <button
-            className={`mode-tab ${mode === 'sandbox' ? 'active' : ''}`}
+            type="button"
+            className="mode-tab"
+            aria-pressed={mode === 'sandbox'}
             onClick={() => setMode('sandbox')}
           >
-            <FlaskConical size={16} />
-            Sandbox & LaTeX
+            Sandbox e LaTeX
           </button>
-        </div>
+        </nav>
 
         <div className="topbar-actions">
-          <button className="ghost-btn" onClick={() => setGuideOpen(true)}>
-            <BookOpen size={15} />
+          <button type="button" className="ghost-btn" onClick={() => setGuideOpen(true)}>
             Guida DSL
           </button>
           <button
+            type="button"
             className="icon-btn"
             onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-            title="Cambia tema chiaro/scuro"
+            aria-label={theme === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'}
+            title={theme === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'}
           >
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === 'dark' ? (
+              <Sun size={16} aria-hidden="true" />
+            ) : (
+              <Moon size={16} aria-hidden="true" />
+            )}
           </button>
         </div>
       </header>
 
-      {mode === 'proofs' ? (
-        <ProofStudio theme={theme} onOpenInSandbox={handleOpenInSandbox} />
-      ) : (
-        <SandboxWorkspace
-          key={sandboxKey}
-          theme={theme}
-          scene={sandboxScene}
-          onSceneChange={setSandboxScene}
-          onOpenGuide={() => setGuideOpen(true)}
-        />
-      )}
+      <main id="main-content" className="workspace-main">
+        {mode === 'proofs' ? (
+          <ProofStudio theme={theme} onOpenInSandbox={handleOpenInSandbox} />
+        ) : (
+          <SandboxWorkspace
+            key={sandboxKey}
+            theme={theme}
+            scene={sandboxScene}
+            onSceneChange={setSandboxScene}
+            onOpenGuide={() => setGuideOpen(true)}
+          />
+        )}
+      </main>
 
       <DslGuideModal
         open={guideOpen}

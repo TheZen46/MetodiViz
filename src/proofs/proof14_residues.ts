@@ -70,7 +70,7 @@ export const proof14Residues: ProofDefinition = {
   number: '14',
   title: 'Teorema dei residui',
   block: 4,
-  blockLabel: 'Blocco 4 — Analisi Complessa',
+  blockLabel: 'Blocco 4: Analisi Complessa',
   lecturer: 'Benini',
   sourceFile: '14 - Teorema dei residui.md',
   status: 'ready',

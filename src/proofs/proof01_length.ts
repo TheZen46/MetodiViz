@@ -54,7 +54,7 @@ export const proof01Length: ProofDefinition = {
   number: '01',
   title: 'Rettificabilità e lunghezza di una curva',
   block: 2,
-  blockLabel: 'Blocco 2 — Curve, Superfici e Integrali',
+  blockLabel: 'Blocco 2: Curve, Superfici e Integrali',
   lecturer: 'Pinamonti',
   sourceFile: '01 - Rettificabilitá e lunghezza di una curva.md',
   status: 'ready',

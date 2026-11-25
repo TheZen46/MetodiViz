@@ -54,7 +54,7 @@ export const proof03GaussGreen: ProofDefinition = {
   number: '03',
   title: 'Formula di Gauss-Green',
   block: 2,
-  blockLabel: 'Blocco 2 — Curve, Superfici e Integrali',
+  blockLabel: 'Blocco 2: Curve, Superfici e Integrali',
   lecturer: 'Pinamonti',
   sourceFile: '03 - Formula di Gauss-Green.md',
   status: 'ready',

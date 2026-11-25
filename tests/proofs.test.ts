@@ -24,10 +24,23 @@ describe('Course Proofs Catalog & 4 Pilot Proofs', () => {
         const measures = evaluateSceneMeasures(step.scene);
         expect(measures.length).toBe(step.scene.measures.length);
         for (const m of measures) {
-          expect(m.value).not.toBe('—');
+          expect(m.value).not.toBe('-');
           expect(m.value).not.toContain('NaN');
         }
       }
+    }
+  });
+
+  it('contains zero em-dash characters in UI and proof source files', () => {
+    const rawFiles = import.meta.glob('/src/**/*.{ts,tsx}', {
+      query: '?raw',
+      import: 'default',
+      eager: true,
+    }) as Record<string, string>;
+    const paths = Object.keys(rawFiles);
+    expect(paths.length).toBeGreaterThan(10);
+    for (const filePath of paths) {
+      expect(rawFiles[filePath], `Em dash found in ${filePath}`).not.toContain('\u2014');
     }
   });
 });

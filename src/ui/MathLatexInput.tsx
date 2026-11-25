@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { MathfieldElement } from 'mathlive';
 import { tryParseLatex } from '../engine/latex/latexParser';
 
@@ -23,6 +23,7 @@ export const MathLatexInput: React.FC<MathLatexInputProps> = ({
   onChange,
   placeholder,
 }) => {
+  const inputId = useId();
   const hostRef = useRef<HTMLDivElement | null>(null);
   const mfRef = useRef<MathfieldElement | null>(null);
   const onChangeRef = useRef(onChange);
@@ -39,8 +40,10 @@ export const MathLatexInput: React.FC<MathLatexInputProps> = ({
     if (!host) return;
 
     const mf = new MathfieldElement();
+    mf.id = inputId;
     mf.value = value;
     mf.mathVirtualKeyboardPolicy = 'manual';
+    if (label) mf.setAttribute('aria-label', label);
     if (placeholder) mf.setAttribute('placeholder', placeholder);
 
     const handleInput = () => {
@@ -57,7 +60,7 @@ export const MathLatexInput: React.FC<MathLatexInputProps> = ({
       mfRef.current = null;
       host.innerHTML = '';
     };
-  }, [rawMode, placeholder]);
+  }, [rawMode, placeholder, inputId, label]);
 
   useEffect(() => {
     if (rawMode) return;
@@ -70,18 +73,21 @@ export const MathLatexInput: React.FC<MathLatexInputProps> = ({
   return (
     <div className="math-input-wrap">
       <div className="math-input-header">
-        <span>{label ?? 'Formula'}</span>
+        <label htmlFor={inputId}>{label ?? 'Formula'}</label>
         <div className="inline-row">
-          <span style={{ color: parseCheck.error ? 'var(--danger)' : 'var(--success)' }}>
-            {parseCheck.error ? 'Errore sintassi' : 'LaTeX OK'}
+          <span
+            aria-live="polite"
+            className={parseCheck.error ? 'math-status-error' : 'math-status-valid'}
+          >
+            {parseCheck.error ? 'Sintassi errata' : 'Valida'}
           </span>
           <button
             type="button"
             className="viz-btn"
+            aria-pressed={rawMode}
             onClick={() => setRawMode((m) => !m)}
-            title="Alterna tra editor matematico visivo e codice LaTeX"
           >
-            {rawMode ? 'Visivo' : 'LaTeX'}
+            {rawMode ? 'Editor visivo' : 'Codice LaTeX'}
           </button>
         </div>
       </div>
@@ -89,6 +95,7 @@ export const MathLatexInput: React.FC<MathLatexInputProps> = ({
       <div className={`math-input-box ${parseCheck.error ? 'invalid' : ''}`}>
         {rawMode ? (
           <input
+            id={inputId}
             type="text"
             className="raw-latex-input"
             value={value}
@@ -100,7 +107,11 @@ export const MathLatexInput: React.FC<MathLatexInputProps> = ({
         )}
       </div>
 
-      {parseCheck.error && <div className="math-input-error">{parseCheck.error}</div>}
+      {parseCheck.error && (
+        <div className="math-input-error" role="alert">
+          {parseCheck.error}
+        </div>
+      )}
     </div>
   );
 };

@@ -111,7 +111,7 @@ export const ViewComplex: React.FC<ViewComplexProps> = ({
     const toScreenX = (x: number) => ((x - cam.xMin) / (cam.xMax - cam.xMin)) * w;
     const toScreenY = (y: number) => h - ((y - cam.yMin) / (cam.yMax - cam.yMin)) * h;
 
-    ctx.fillStyle = theme === 'dark' ? '#0b1120' : '#f8fafc';
+    ctx.fillStyle = theme === 'dark' ? '#121417' : '#f5f2eb';
     ctx.fillRect(0, 0, w, h);
 
     // Domain coloring
@@ -484,23 +484,29 @@ export const ViewComplex: React.FC<ViewComplexProps> = ({
   return (
     <div className="viz-wrapper">
       <div className="viz-toolbar">
-        <div className="viz-tool-group">
+        <div className="viz-tool-group" role="group" aria-label="Strumenti Piano Complesso">
           <button
-            className={`viz-btn ${tool === 'manipulate' ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={tool === 'manipulate'}
             onClick={() => setTool('manipulate')}
             title="Trascina poli, sposta o ridimensiona il contorno C"
           >
             Sposta Poli / Contorno
           </button>
           <button
-            className={`viz-btn ${tool === 'probe' ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={tool === 'probe'}
             onClick={() => setTool('probe')}
           >
             Sonda Complessa
           </button>
           {onAddPole && (
             <button
-              className={`viz-btn ${tool === 'addPole' ? 'active' : ''}`}
+              type="button"
+              className="viz-btn"
+              aria-pressed={tool === 'addPole'}
               onClick={() => setTool('addPole')}
             >
               + Polo
@@ -510,12 +516,15 @@ export const ViewComplex: React.FC<ViewComplexProps> = ({
 
         <div className="viz-tool-group">
           <button
-            className={`viz-btn ${domainColoring ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={domainColoring}
             onClick={() => setDomainColoring((v) => !v)}
           >
             Domain Coloring
           </button>
           <button
+            type="button"
             className="viz-btn"
             onClick={() =>
               setCam({

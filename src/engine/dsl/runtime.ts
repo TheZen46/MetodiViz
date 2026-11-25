@@ -194,10 +194,10 @@ export function evaluateSceneMeasures(scene: SceneSpec): ComputedMeasure[] {
       const v = evalReal(parsed.ast, scope);
       results.push({
         label: m.label,
-        value: Number.isFinite(v) ? v.toFixed(4) : '—',
+        value: Number.isFinite(v) ? v.toFixed(4) : '-',
       });
     } else {
-      results.push({ label: m.label, value: '—' });
+      results.push({ label: m.label, value: '-' });
     }
   }
 

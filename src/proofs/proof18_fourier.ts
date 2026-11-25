@@ -39,7 +39,7 @@ export const proof18Fourier: ProofDefinition = {
   number: '18',
   title: 'Teorema di Fourier',
   block: 3,
-  blockLabel: 'Blocco 3 — Serie di Fourier',
+  blockLabel: 'Blocco 3: Serie di Fourier',
   lecturer: 'Benini',
   sourceFile: '18 - Teorema di Fourier.md',
   status: 'ready',

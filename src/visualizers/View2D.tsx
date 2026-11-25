@@ -153,7 +153,7 @@ export const View2D: React.FC<View2DProps> = ({ scene, theme, onUpdatePoint, onA
     const toScreenY = (y: number) => h - ((y - cam.yMin) / (cam.yMax - cam.yMin)) * h;
 
     // Background
-    ctx.fillStyle = theme === 'dark' ? '#0b1120' : '#f8fafc';
+    ctx.fillStyle = theme === 'dark' ? '#121417' : '#f5f2eb';
     ctx.fillRect(0, 0, w, h);
 
     // Optional Curl heatmap inside domain or viewport
@@ -741,23 +741,40 @@ export const View2D: React.FC<View2DProps> = ({ scene, theme, onUpdatePoint, onA
   return (
     <div className="viz-wrapper">
       <div className="viz-toolbar">
-        <div className="viz-tool-group">
-          <button className={`viz-btn ${tool === 'pan' ? 'active' : ''}`} onClick={() => setTool('pan')}>
+        <div className="viz-tool-group" role="group" aria-label="Strumenti 2D">
+          <button
+            type="button"
+            className="viz-btn"
+            aria-pressed={tool === 'pan'}
+            onClick={() => setTool('pan')}
+          >
             Naviga / Trascina
           </button>
-          <button className={`viz-btn ${tool === 'probe' ? 'active' : ''}`} onClick={() => setTool('probe')}>
+          <button
+            type="button"
+            className="viz-btn"
+            aria-pressed={tool === 'probe'}
+            onClick={() => setTool('probe')}
+          >
             Sonda
           </button>
           {onAddPoint && (
             <button
-              className={`viz-btn ${tool === 'addPoint' ? 'active' : ''}`}
+              type="button"
+              className="viz-btn"
+              aria-pressed={tool === 'addPoint'}
               onClick={() => setTool('addPoint')}
             >
               + Punto
             </button>
           )}
           {hasVectorField && (
-            <button className={`viz-btn ${tool === 'flow' ? 'active' : ''}`} onClick={() => setTool('flow')}>
+            <button
+              type="button"
+              className="viz-btn"
+              aria-pressed={tool === 'flow'}
+              onClick={() => setTool('flow')}
+            >
               Linea di Flusso
             </button>
           )}
@@ -765,11 +782,12 @@ export const View2D: React.FC<View2DProps> = ({ scene, theme, onUpdatePoint, onA
 
         <div className="viz-tool-group">
           {flowSeeds.length > 0 && (
-            <button className="viz-btn" onClick={() => setFlowSeeds([])}>
+            <button type="button" className="viz-btn" onClick={() => setFlowSeeds([])}>
               Pulisci Tracce
             </button>
           )}
           <button
+            type="button"
             className="viz-btn"
             onClick={() =>
               setCam({

@@ -64,6 +64,7 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
   const [wireframe, setWireframe] = useState(false);
   const [showSection, setShowSection] = useState(false);
   const [sectionZ, setSectionZ] = useState(0);
+  const [webglError, setWebglError] = useState<string | null>(null);
   const [probe, setProbe] = useState<ProbeInfo3D | null>(null);
   const [tangentInfo, setTangentInfo] = useState<{
     x: number;
@@ -85,7 +86,14 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
     const container = containerRef.current;
     if (!container) return;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch {
+      setWebglError('Impossibile inizializzare WebGL su questo browser. Verifica l’accelerazione hardware oppure usa le viste 2D/Complesso.');
+      return;
+    }
+    setWebglError(null);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(container.clientWidth || 640, container.clientHeight || 480);
     container.appendChild(renderer.domElement);
@@ -287,7 +295,7 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer) return;
-    renderer.setClearColor(theme === 'dark' ? 0x0b1120 : 0xf8fafc, 1);
+    renderer.setClearColor(theme === 'dark' ? 0x121417 : 0xf5f2eb, 1);
   }, [theme]);
 
   // Update section plane
@@ -564,23 +572,29 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
   return (
     <div className="viz-wrapper">
       <div className="viz-toolbar">
-        <div className="viz-tool-group">
+        <div className="viz-tool-group" role="group" aria-label="Strumenti 3D">
           <button
-            className={`viz-btn ${tool === 'orbit' ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={tool === 'orbit'}
             onClick={() => setTool('orbit')}
             title="Ruota 360°, zoom e pan"
           >
             Orbita 360°
           </button>
           <button
-            className={`viz-btn ${tool === 'probe' ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={tool === 'probe'}
             onClick={() => setTool('probe')}
             title="Passa il mouse su superfici o curve per leggere coordinate e gradiente"
           >
             Sonda
           </button>
           <button
-            className={`viz-btn ${tool === 'tangent' ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={tool === 'tangent'}
             onClick={() => setTool('tangent')}
             title="Clicca su una superficie per disegnare piano tangente, normale e gradiente"
           >
@@ -588,7 +602,9 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
           </button>
           {onAddPoint && (
             <button
-              className={`viz-btn ${tool === 'addPoint' ? 'active' : ''}`}
+              type="button"
+              className="viz-btn"
+              aria-pressed={tool === 'addPoint'}
               onClick={() => setTool('addPoint')}
               title="Clicca sulla scena per posizionare un punto"
             >
@@ -597,25 +613,29 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
           )}
         </div>
 
-        <div className="viz-tool-group">
-          <button className="viz-btn" onClick={() => setPresetCamera('3d')}>3D</button>
-          <button className="viz-btn" onClick={() => setPresetCamera('xy')}>XY</button>
-          <button className="viz-btn" onClick={() => setPresetCamera('xz')}>XZ</button>
-          <button className="viz-btn" onClick={() => setPresetCamera('yz')}>YZ</button>
+        <div className="viz-tool-group" role="group" aria-label="Proiezione e opzioni 3D">
+          <button type="button" className="viz-btn" onClick={() => setPresetCamera('3d')}>3D</button>
+          <button type="button" className="viz-btn" onClick={() => setPresetCamera('xy')}>XY</button>
+          <button type="button" className="viz-btn" onClick={() => setPresetCamera('xz')}>XZ</button>
+          <button type="button" className="viz-btn" onClick={() => setPresetCamera('yz')}>YZ</button>
           <button
-            className={`viz-btn ${wireframe ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={wireframe}
             onClick={() => setWireframe((w) => !w)}
           >
             Wireframe
           </button>
           <button
-            className={`viz-btn ${showSection ? 'active' : ''}`}
+            type="button"
+            className="viz-btn"
+            aria-pressed={showSection}
             onClick={() => setShowSection((s) => !s)}
           >
             Sezione z=c
           </button>
           {tangentInfo && (
-            <button className="viz-btn" onClick={() => setTangentInfo(null)}>
+            <button type="button" className="viz-btn" onClick={() => setTangentInfo(null)}>
               Pulisci Tangente
             </button>
           )}
@@ -624,9 +644,10 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
 
       {showSection && (
         <div className="viz-subbar">
-          <label>
+          <label htmlFor="section-z-slider">
             Piano di sezione z = {sectionZ.toFixed(2)}
             <input
+              id="section-z-slider"
               type="range"
               min={scene.range.z[0]}
               max={scene.range.z[1]}
@@ -638,7 +659,13 @@ export const View3D: React.FC<View3DProps> = ({ scene, theme, onAddPoint }) => {
         </div>
       )}
 
-      <div className="viz-canvas-host" ref={containerRef} />
+      {webglError ? (
+        <div className="viz-error-box" role="alert">
+          <strong>Vista 3D non disponibile:</strong> {webglError}
+        </div>
+      ) : (
+        <div className="viz-canvas-host" ref={containerRef} />
+      )}
 
       <div className="viz-hud">
         {probe ? (
