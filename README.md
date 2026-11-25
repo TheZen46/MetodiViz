@@ -2,20 +2,20 @@
 
 Applicazione web locale per studiare le dimostrazioni del corso di Metodi Matematici attraverso grafici interattivi 3D, 2D e nel piano complesso. Funziona interamente nel browser, senza backend esterni.
 
-Il progetto è alla versione `0.1.0` (MVP): il motore di calcolo, i tre visualizzatori, l'editor LaTeX visivo e le prime 4 dimostrazioni guida sono completi e testati. Le restanti 14 dimostrazioni del catalogo sono segnate come da completare.
+Il progetto è alla versione `0.2.0`: il motore di calcolo, i tre visualizzatori, l'editor LaTeX visivo e tutte le 18 dimostrazioni del corso sono completi e testati.
 
 ## Stato delle dimostrazioni
 
-Il programma del corso è suddiviso in quattro blocchi. La tabella riassume la copertura attuale:
+Tutte le 18 dimostrazioni dei quattro blocchi del corso sono attive con passaggi sincronizzati e misure live:
 
-| Blocco | Dimostrazioni pronte | In programma |
-| :--- | :--- | :--- |
-| 1. Calcolo differenziale in R^n | nessuna | `06` Funzione implicita, `07` Funzione inversa |
-| 2. Curve, superfici e integrali | `01` Rettificabilità e lunghezza di una curva, `03` Formula di Gauss-Green | `02` Condizioni di integrabilità, `04` Divergenza in 2D, `05` Stokes in 2D |
-| 3. Serie di Fourier | `18` Teorema di Fourier | `16` Seno cardinale, `17` Lemma di Riemann |
-| 4. Analisi complessa | `14` Teorema dei residui | `08` Numeri complessi, `09` Modulo e forma trigonometrica, `10` Formula di Eulero, `11` Cauchy-Riemann, `12` Teorema di Cauchy, `13` Formula integrale di Cauchy, `15` Lemma di Jordan |
+| Blocco | Dimostrazioni incluse |
+| :--- | :--- |
+| 1. Calcolo differenziale in R^n | `06` Funzione implicita, `07` Funzione inversa |
+| 2. Curve, superfici e integrali | `01` Rettificabilità e lunghezza di una curva, `02` Condizioni di integrabilità, `03` Formula di Gauss-Green, `04` Divergenza in 2D, `05` Stokes in 2D |
+| 3. Serie di Fourier | `16` Seno cardinale, `17` Lemma di Riemann, `18` Teorema di Fourier |
+| 4. Analisi complessa | `08` Numeri complessi, `09` Modulo e forma trigonometrica, `10` Formula di Eulero, `11` Cauchy-Riemann, `12` Teorema di Cauchy, `13` Formula integrale di Cauchy, `14` Teorema dei residui, `15` Lemma di Jordan |
 
-Chi vuole aggiungere una delle 14 dimostrazioni mancanti può seguire la guida in [CONTRIBUTING.md](CONTRIBUTING.md).
+Chi vuole aggiungere nuovi esempi o estendere i visualizzatori può leggere [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Cosa puoi fare nell'app
 

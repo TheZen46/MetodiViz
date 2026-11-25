@@ -2,13 +2,16 @@ import { describe, expect, it } from 'vitest';
 import {
   contourIntegralComplex,
   curveLengthExact,
+  darbouxSums2D,
+  divergenceVerify2D,
   estimateResidue,
   evaluateFourierPartialSum,
   fourierCoefficients,
   gaussGreenVerify,
   polygonalLength,
+  upperSemicircleIntegralComplex,
 } from '../src/engine/math/numerics';
-import { cDiv } from '../src/engine/math/complex';
+import { cAbs, cDiv, cExp } from '../src/engine/math/complex';
 
 describe('numerics engine', () => {
   it('computes exact helix length and polygonal convergence', () => {
@@ -65,5 +68,35 @@ describe('numerics engine', () => {
     expect(evaluateFourierPartialSum(a0, ak, bk, 0)).toBeCloseTo(0, 1);
     expect(evaluateFourierPartialSum(a0, ak, bk, Math.PI / 2)).toBeCloseTo(1, 1);
     expect(evaluateFourierPartialSum(a0, ak, bk, -Math.PI / 2)).toBeCloseTo(-1, 1);
+  });
+
+  it('shrinks Darboux upper-lower gap as partition refines', () => {
+    const fn = (x: number, y: number) => 1.4 + 0.5 * Math.sin(x) * Math.cos(y);
+    const coarse = darbouxSums2D(fn, 0, 3, 0, 3, 2);
+    const fine = darbouxSums2D(fn, 0, 3, 0, 3, 18);
+    expect(coarse.upper).toBeGreaterThan(coarse.lower);
+    expect(fine.gap).toBeLessThan(coarse.gap);
+  });
+
+  it('verifies 2D divergence theorem flux equals double integral of div F', () => {
+    const F1 = (x: number, y: number) => x + 0.15 * y * y;
+    const F2 = (x: number, y: number) => y - 0.1 * x * x;
+    const alpha = (x: number) => 0.7 + 0.22 * Math.sin(2.5 * x);
+    const beta = (x: number) => 2.5 + 0.3 * Math.cos(1.6 * x);
+
+    const res = divergenceVerify2D(F1, F2, 0.6, 3.1, alpha, beta, 64);
+    expect(Math.abs(res.fluxIntegral - res.divDoubleIntegral)).toBeLessThan(1e-3);
+  });
+
+  it('decays upper semicircle integral in Jordan lemma as rho grows', () => {
+    const fz = (z: { re: number; im: number }) => {
+      const num = cExp({ re: -z.im, im: z.re });
+      const den = { re: z.re * z.re - z.im * z.im + 1, im: 2 * z.re * z.im };
+      return cDiv(num, den);
+    };
+    const small = cAbs(upperSemicircleIntegralComplex(fz, 2.0, 256));
+    const large = cAbs(upperSemicircleIntegralComplex(fz, 10.0, 256));
+    expect(large).toBeLessThan(small);
+    expect(large).toBeLessThan(0.05);
   });
 });

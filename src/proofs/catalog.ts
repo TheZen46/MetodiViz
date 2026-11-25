@@ -1,67 +1,49 @@
 import { proof01Length } from './proof01_length';
+import { proof02Integrability } from './proof02_integrability';
 import { proof03GaussGreen } from './proof03_gaussGreen';
+import { proof04Divergence2d } from './proof04_divergence2d';
+import { proof05Stokes2d } from './proof05_stokes2d';
+import { proof06Implicit } from './proof06_implicit';
+import { proof07Inverse } from './proof07_inverse';
+import { proof08ComplexNumbers } from './proof08_complexNumbers';
+import { proof09PolarForm } from './proof09_polarForm';
+import { proof10Euler } from './proof10_euler';
+import { proof11CauchyRiemann } from './proof11_cauchyRiemann';
+import { proof12CauchyTheorem } from './proof12_cauchyTheorem';
+import { proof13CauchyFormula } from './proof13_cauchyFormula';
 import { proof14Residues } from './proof14_residues';
+import { proof15Jordan } from './proof15_jordan';
+import { proof16Sinc } from './proof16_sinc';
+import { proof17Riemann } from './proof17_riemann';
 import { proof18Fourier } from './proof18_fourier';
 import { ProofDefinition } from './types';
-import { createEmptyScene } from '../engine/dsl/dslParser';
-
-function makePlanned(
-  number: string,
-  title: string,
-  block: 1 | 2 | 3 | 4,
-  blockLabel: string,
-  lecturer: 'Pinamonti' | 'Benini',
-  sourceFile: string
-): ProofDefinition {
-  return {
-    id: `proof-${number}`,
-    number,
-    title,
-    block,
-    blockLabel,
-    lecturer,
-    sourceFile,
-    status: 'planned',
-    statementLatex: `\\text{Dimostrazione } ${number}\\text{ (in programma per la Fase 2)}`,
-    hypotheses: ['Verrà integrata nella Fase 2 del progetto a partire dagli appunti del corso'],
-    steps: [
-      {
-        title: 'In arrivo nella Fase 2',
-        explanation:
-          'Questa dimostrazione fa parte del catalogo completo delle 18 dimostrazioni del corso. Puoi comunque usare la Modalità Sandbox per visualizzarne subito le formule e i grafici!',
-        formulasLatex: [],
-        scene: createEmptyScene(block === 4 ? 'complex' : block === 3 ? '2d' : '3d'),
-      },
-    ],
-  };
-}
 
 export const ALL_PROOFS: ProofDefinition[] = [
   // Blocco 1
-  makePlanned('06', 'Teorema della funzione implicita', 1, 'Blocco 1: Calcolo Differenziale in ℝⁿ', 'Pinamonti', '06 - Teorema della funzione implicita.md'),
-  makePlanned('07', 'Teorema della funzione inversa', 1, 'Blocco 1: Calcolo Differenziale in ℝⁿ', 'Pinamonti', '07 - Teorema della funzione inversa.md'),
+  proof06Implicit,
+  proof07Inverse,
 
   // Blocco 2
   proof01Length,
-  makePlanned('02', 'Condizioni di integrabilità', 2, 'Blocco 2: Curve, Superfici e Integrali', 'Pinamonti', '02 - Condizioni di integrabilitá.md'),
+  proof02Integrability,
   proof03GaussGreen,
-  makePlanned('04', 'Divergenza in 2D', 2, 'Blocco 2: Curve, Superfici e Integrali', 'Pinamonti', '04 - Divergenza in 2D.md'),
-  makePlanned('05', 'Teorema di Stokes in 2D', 2, 'Blocco 2: Curve, Superfici e Integrali', 'Pinamonti', '05 - Teorema di Stokes in 2D.md'),
+  proof04Divergence2d,
+  proof05Stokes2d,
 
   // Blocco 3
-  makePlanned('16', 'Seno cardinale', 3, 'Blocco 3: Serie di Fourier', 'Benini', '16 - Seno cardinale.md'),
-  makePlanned('17', 'Lemma di Riemann', 3, 'Blocco 3: Serie di Fourier', 'Benini', '17 - Lemma di Riemann.md'),
+  proof16Sinc,
+  proof17Riemann,
   proof18Fourier,
 
   // Blocco 4
-  makePlanned('08', 'Numeri complessi', 4, 'Blocco 4: Analisi Complessa', 'Benini', '08 - Numeri complessi.md'),
-  makePlanned('09', 'Modulo e forma trigonometrica', 4, 'Blocco 4: Analisi Complessa', 'Benini', '09 - Modulo e forma trigonometrica.md'),
-  makePlanned('10', 'Numeri complessi e formula di Eulero', 4, 'Blocco 4: Analisi Complessa', 'Benini', '10 - Numeri complessi (2024) e formula di Eulero.md'),
-  makePlanned('11', 'Condizioni di Cauchy-Riemann', 4, 'Blocco 4: Analisi Complessa', 'Benini', '11 - Condizioni di Cauchy-Riemann.md'),
-  makePlanned('12', 'Teorema di Cauchy', 4, 'Blocco 4: Analisi Complessa', 'Benini', '12 - Teorema di Cauchy.md'),
-  makePlanned('13', 'Formula integrale di Cauchy', 4, 'Blocco 4: Analisi Complessa', 'Benini', '13 - Formula integrale di Cauchy.md'),
+  proof08ComplexNumbers,
+  proof09PolarForm,
+  proof10Euler,
+  proof11CauchyRiemann,
+  proof12CauchyTheorem,
+  proof13CauchyFormula,
   proof14Residues,
-  makePlanned('15', 'Lemma di Jordan', 4, 'Blocco 4: Analisi Complessa', 'Benini', '15 - Lemma di Jordan.md'),
+  proof15Jordan,
 ];
 
 export const PILOT_PROOFS: ProofDefinition[] = ALL_PROOFS.filter((p) => p.status === 'ready');

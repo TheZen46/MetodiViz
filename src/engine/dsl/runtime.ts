@@ -3,12 +3,16 @@ import { tryParseLatex } from '../latex/latexParser';
 import {
   contourIntegralComplex,
   curveLengthExact,
+  darbouxSums2D,
+  divergenceVerify2D,
   estimateResidue,
   gaussGreenVerify,
+  integrate1D,
   isInsideEllipse,
   polygonalLength,
+  upperSemicircleIntegralComplex,
 } from '../math/numerics';
-import { Complex, cAdd, cDiv, cMul, formatComplex } from '../math/complex';
+import { Complex, cAbs, cAdd, cDiv, cMul, formatComplex } from '../math/complex';
 import { PoleObject, SceneSpec } from './types';
 
 export interface ComputedMeasure {
@@ -75,8 +79,7 @@ export function evaluateSceneMeasures(scene: SceneSpec): ComputedMeasure[] {
   const results: ComputedMeasure[] = [];
 
   for (const m of scene.measures) {
-    // Built-in symbolic measures: length(id), exactLength(id), gaussGreenLine(), gaussGreenDouble(), contourIntegral(), residuesSum()
-    const fnMatch = m.expr.match(/^([a-zA-Z0-9_]+)\(([^)]*)\)$/);
+    const fnMatch = m.expr.match(/^([a-zA-Z0-9_]+)\((.*)\)$/);
     if (fnMatch) {
       const fnName = fnMatch[1];
       const arg = fnMatch[2].trim();
@@ -182,6 +185,117 @@ export function evaluateSceneMeasures(scene: SceneSpec): ComputedMeasure[] {
             }
             const total = cMul({ re: 0, im: 2 * Math.PI }, sumRes);
             results.push({ label: m.label, value: formatComplex(total, 3) });
+            continue;
+          }
+        }
+      }
+
+      if (fnName === 'cauchyFormula') {
+        const fz = compileComplexSceneFn(scene, scope);
+        const contour = scene.objects.find((o) => o.kind === 'contour' && o.visible);
+        if (fz && contour && contour.kind === 'contour') {
+          const integral = contourIntegralComplex(
+            fz,
+            contour.cx,
+            contour.cy,
+            contour.rx,
+            contour.ry,
+            256
+          );
+          const val = cDiv(integral, { re: 0, im: 2 * Math.PI });
+          results.push({ label: m.label, value: formatComplex(val, 3) });
+          continue;
+        }
+      }
+
+      if (fnName === 'jordanArcAbs') {
+        const fz = compileComplexSceneFn(scene, scope);
+        const rhoFn = compileRealExpr(arg || 'rho', scope);
+        if (fz && rhoFn) {
+          const rho = rhoFn({});
+          const arcVal = upperSemicircleIntegralComplex(fz, rho, 256);
+          results.push({ label: m.label, value: cAbs(arcVal).toFixed(4) });
+          continue;
+        }
+      }
+
+      if (fnName === 'evalComplexAt') {
+        const parts = arg.split(',').map((s) => s.trim());
+        const fz = compileComplexSceneFn(scene, scope);
+        if (fz && parts.length >= 3) {
+          const reFn = compileRealExpr(parts[1], scope);
+          const imFn = compileRealExpr(parts[2], scope);
+          if (reFn && imFn) {
+            const val = fz({ re: reFn({}), im: imFn({}) });
+            results.push({ label: m.label, value: formatComplex(val, 3) });
+            continue;
+          }
+        }
+      }
+
+      if (fnName === 'darbouxUpper' || fnName === 'darbouxLower' || fnName === 'darbouxGap') {
+        const surf = scene.objects.find((o) => o.kind === 'surface' && o.id === arg);
+        if (surf && surf.kind === 'surface') {
+          const compiled = compileRealExpr(surf.expr, scope);
+          if (compiled) {
+            const n = scope.n ?? scope.N ?? 6;
+            const res = darbouxSums2D(
+              (x, y) => compiled({ x, y }),
+              scene.range.x[0],
+              scene.range.x[1],
+              scene.range.y[0],
+              scene.range.y[1],
+              n
+            );
+            const v =
+              fnName === 'darbouxUpper'
+                ? res.upper
+                : fnName === 'darbouxLower'
+                ? res.lower
+                : res.gap;
+            results.push({ label: m.label, value: v.toFixed(4) });
+            continue;
+          }
+        }
+      }
+
+      if (fnName === 'divergenceFlux' || fnName === 'divergenceDouble') {
+        const vf = scene.objects.find((o) => o.kind === 'vectorfield');
+        const dom = scene.objects.find((o) => o.kind === 'domain');
+        if (vf && vf.kind === 'vectorfield' && dom && dom.kind === 'domain') {
+          const F1 = compileRealExpr(vf.fxExpr, scope);
+          const F2 = compileRealExpr(vf.fyExpr, scope);
+          const aFn = compileRealExpr(dom.aExpr, scope);
+          const bFn = compileRealExpr(dom.bExpr, scope);
+          const alphaFn = compileRealExpr(dom.alphaExpr, scope);
+          const betaFn = compileRealExpr(dom.betaExpr, scope);
+          if (F1 && F2 && aFn && bFn && alphaFn && betaFn) {
+            const res = divergenceVerify2D(
+              (x, y) => F1({ x, y }),
+              (x, y) => F2({ x, y }),
+              aFn({}),
+              bFn({}),
+              (x) => alphaFn({ x }),
+              (x) => betaFn({ x }),
+              48
+            );
+            const val = fnName === 'divergenceFlux' ? res.fluxIntegral : res.divDoubleIntegral;
+            results.push({ label: m.label, value: val.toFixed(4) });
+            continue;
+          }
+        }
+      }
+
+      if (fnName === 'integral1D') {
+        const parts = arg.split(',').map((s) => s.trim());
+        const plot = scene.objects.find((o) => o.kind === 'plot' && o.id === parts[0]);
+        if (plot && plot.kind === 'plot' && parts.length === 3) {
+          const fn = compileRealExpr(plot.expr, scope);
+          const aFn = compileRealExpr(parts[1], scope);
+          const bFn = compileRealExpr(parts[2], scope);
+          if (fn && aFn && bFn) {
+            const val = integrate1D((x) => fn({ x }), aFn({}), bFn({}), 300);
+            results.push({ label: m.label, value: val.toFixed(4) });
             continue;
           }
         }

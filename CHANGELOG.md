@@ -2,6 +2,19 @@
 
 Tutte le modifiche rilevanti al progetto vengono documentate in questo file.
 
+## 0.2.0 (2026-11-25)
+
+Copertura completa di tutte le 18 dimostrazioni del corso e revisione UI/UX.
+
+### Aggiunto
+- Implementate tutte le 14 dimostrazioni restanti (`02`, `04`, `05`, `06`, `07`, `08`, `09`, `10`, `11`, `12`, `13`, `15`, `16`, `17`) sincronizzate con i visualizzatori 3D, 2D e complesso.
+- Esteso il motore numerico (`src/engine/math/numerics.ts` e `runtime.ts`) con somme di Darboux 2D, verifica del teorema della divergenza, integrali 1D su plot, formula integrale di Cauchy e integrale sulla semicirconferenza di Jordan.
+- File `DESIGN.md` con palette WCAG AA verificata, tipografia serif per teoremi e supporto responsive a tre breakpoint (desktop, tablet con drawer, mobile con switcher dedicato).
+
+### Modificato
+- Migliorata l'accessibilità da tastiera (skip link, focus visibile, bottoni nativi per passaggi e modali, `aria-pressed` / `aria-selected`) e corretto il contrasto di MathLive in tema scuro.
+- Aggiornati i riferimenti di licenza a GNU AGPL-3.0.
+
 ## 0.1.0 (2026-11-25)
 
 Prima release pubblica (MVP).

@@ -343,3 +343,99 @@ export function dirichletKernel(n: number, y: number): number {
 export function sumComplexTerms(terms: Complex[]): Complex {
   return terms.reduce((acc, item) => cAdd(acc, item), { re: 0, im: 0 });
 }
+
+export function darbouxSums2D(
+  fn: (x: number, y: number) => number,
+  xMin: number,
+  xMax: number,
+  yMin: number,
+  yMax: number,
+  n: number
+): { upper: number; lower: number; gap: number } {
+  const divs = Math.max(1, Math.min(40, Math.round(n)));
+  const dx = (xMax - xMin) / divs;
+  const dy = (yMax - yMin) / divs;
+  const cellArea = dx * dy;
+  const sub = 4;
+  let upper = 0;
+  let lower = 0;
+
+  for (let ix = 0; ix < divs; ix++) {
+    const x0 = xMin + ix * dx;
+    for (let iy = 0; iy < divs; iy++) {
+      const y0 = yMin + iy * dy;
+      let cellMin = Infinity;
+      let cellMax = -Infinity;
+      for (let sx = 0; sx <= sub; sx++) {
+        const x = x0 + (dx * sx) / sub;
+        for (let sy = 0; sy <= sub; sy++) {
+          const y = y0 + (dy * sy) / sub;
+          const v = fn(x, y);
+          if (Number.isFinite(v)) {
+            if (v < cellMin) cellMin = v;
+            if (v > cellMax) cellMax = v;
+          }
+        }
+      }
+      if (Number.isFinite(cellMin) && Number.isFinite(cellMax)) {
+        lower += cellMin * cellArea;
+        upper += cellMax * cellArea;
+      }
+    }
+  }
+  return { upper, lower, gap: upper - lower };
+}
+
+export function divergenceVerify2D(
+  F1: (x: number, y: number) => number,
+  F2: (x: number, y: number) => number,
+  a: number,
+  b: number,
+  alpha: (x: number) => number,
+  beta: (x: number) => number,
+  steps = 64
+): { fluxIntegral: number; divDoubleIntegral: number } {
+  // Using G = (-F2, F1), outward normal flux of F equals counterclockwise circulation of G.
+  const h = 1e-4;
+  const g1 = (x: number, y: number) => -F2(x, y);
+  const g2 = (x: number, y: number) => F1(x, y);
+  const res = gaussGreenVerify(g1, g2, a, b, alpha, beta, steps);
+  const divDoubleIntegral = integrate1D(
+    (x) => {
+      const y0 = alpha(x);
+      const y1 = beta(x);
+      return integrate1D((y) => vectorFieldCurlAndDiv(F1, F2, x, y, h).div, y0, y1, 40);
+    },
+    a,
+    b,
+    steps
+  );
+  return { fluxIntegral: res.lineIntegral, divDoubleIntegral };
+}
+
+export function upperSemicircleIntegralComplex(
+  fz: (z: Complex) => Complex,
+  rho: number,
+  samples = 256
+): Complex {
+  let sumRe = 0;
+  let sumIm = 0;
+  const dEta = Math.PI / samples;
+  for (let k = 0; k < samples; k++) {
+    const eta = (k + 0.5) * dEta;
+    const z: Complex = {
+      re: rho * Math.cos(eta),
+      im: rho * Math.sin(eta),
+    };
+    const dz: Complex = {
+      re: -rho * Math.sin(eta) * dEta,
+      im: rho * Math.cos(eta) * dEta,
+    };
+    const val = fz(z);
+    if (!Number.isFinite(val.re) || !Number.isFinite(val.im)) continue;
+    const prod = cMul(val, dz);
+    sumRe += prod.re;
+    sumIm += prod.im;
+  }
+  return { re: sumRe, im: sumIm };
+}
