@@ -84,4 +84,4 @@ Le proposte di correzione, le segnalazioni di bug e le nuove dimostrazioni sono 
 
 ## Licenza
 
-Questo progetto è distribuito sotto licenza MIT. Vedi [LICENSE](LICENSE).
+Questo progetto è distribuito sotto licenza GNU AGPL-3.0. Vedi [LICENSE](LICENSE).

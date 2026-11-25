@@ -3,7 +3,7 @@
   "private": false,
   "version": "0.1.0",
   "type": "module",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "author": "Zen",
   "description": "Visualizzatore grafico 3D, 2D e complesso per studiare le dimostrazioni di Metodi Matematici",
   "keywords": [
